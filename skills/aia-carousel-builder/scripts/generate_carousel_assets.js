@@ -4,7 +4,12 @@
 const fs = require("fs");
 const path = require("path");
 
-const SIZE = 1254;
+const BASE_SIZE = 1254;
+const FORMAT_OPTIONS = {
+  "vertical-principal": { width: 1080, height: 1440 },
+  "vertical-classic": { width: 1080, height: 1350 },
+  square: { width: 1080, height: 1080 },
+};
 const DEFAULT_HASHTAGS =
   "#chatgpt #inteligenciaartificial #chatgptwork #plataformaaia #produtividade";
 
@@ -14,6 +19,7 @@ function parseArgs(argv) {
     outputRoot: null,
     htmlOnly: false,
     limitCarousel: null,
+    format: null,
   };
 
   for (let index = 2; index < argv.length; index += 1) {
@@ -26,6 +32,8 @@ function parseArgs(argv) {
       args.htmlOnly = true;
     } else if (arg === "--carousel") {
       args.limitCarousel = Number(argv[++index]);
+    } else if (arg === "--format") {
+      args.format = argv[++index];
     } else if (arg === "--help" || arg === "-h") {
       printHelp();
       process.exit(0);
@@ -40,6 +48,9 @@ function parseArgs(argv) {
   if (!args.outputRoot) {
     throw new Error("Missing required --output-root argument");
   }
+  if (!FORMAT_OPTIONS[args.format]) {
+    throw new Error(`Missing or invalid --format. Choose one of: ${Object.keys(FORMAT_OPTIONS).join(", ")}`);
+  }
   return args;
 }
 
@@ -47,11 +58,13 @@ function printHelp() {
   console.log(`Usage:
 node scripts/generate_carousel_assets.js \\
   --parsed-json parsed-slides.json \\
-  --output-root "Redes Sociais/Instagram/Serie ChatGPT Work"
+  --output-root "Redes Sociais/Instagram/Serie ChatGPT Work" \\
+  --format vertical-principal
 
 Options:
   --html-only       Generate slide HTML without rendering PNG screenshots.
   --carousel N      Generate only one carousel number.
+  --format NAME     vertical-principal, vertical-classic, or square.
 `);
 }
 
@@ -274,7 +287,7 @@ function renderTextSlide(lines, slideNumber) {
   `;
 }
 
-function renderSlide(carousel, slide, logoDataUrl) {
+function renderSlide(carousel, slide, logoDataUrl, canvas) {
   const lines = contentWithoutSeriesLine(slide);
   const slideNumber = slide.number;
   const isCover = slideNumber === 1;
@@ -289,9 +302,9 @@ function renderSlide(carousel, slide, logoDataUrl) {
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=${SIZE}, initial-scale=1" />
-  <title>Carrossel ${carousel.number} - Slide ${slide.number}</title>
-  <style>${css()}</style>
+  <meta name="viewport" content="width=${canvas.width}, initial-scale=1" />
+  <title>Carousel ${carousel.number} - Slide ${slide.number}</title>
+  <style>${css(canvas)}</style>
 </head>
 <body>
   <section class="slide">
@@ -305,22 +318,24 @@ function renderSlide(carousel, slide, logoDataUrl) {
 </html>`;
 }
 
-function css() {
+function css(canvas) {
   return `
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      width: ${SIZE}px;
-      height: ${SIZE}px;
+      width: ${canvas.width}px;
+      height: ${canvas.height}px;
       overflow: hidden;
       font-family: Inter, Arial, Helvetica, sans-serif;
       background: #020713;
     }
     .slide {
       position: relative;
-      width: ${SIZE}px;
-      height: ${SIZE}px;
+      width: ${BASE_SIZE}px;
+      height: ${BASE_SIZE}px;
       overflow: hidden;
+      transform: scale(${canvas.width / BASE_SIZE}, ${canvas.height / BASE_SIZE});
+      transform-origin: top left;
       color: #f7f9ff;
       background:
         radial-gradient(circle at 78% 73%, rgba(0, 217, 255, 0.32), transparent 26%),
@@ -655,7 +670,7 @@ function descriptionMarkdown(carousel) {
     if (lines[0] && /^S[eé]rie\s+ChatGPT Work/i.test(lines[0])) return lines.slice(1);
     return lines;
   };
-  const title = normalizeSentence(carousel.title || `Carrossel ${carousel.number}`);
+  const title = normalizeSentence(carousel.title || `Carousel ${carousel.number}`);
   const firstSlide = (carousel.slides || []).find((slide) => slide.number === 1) || (carousel.slides || [])[0] || {};
   const firstLines = contentWithoutSeries(firstSlide).map(cleanLine).filter(Boolean);
   let ideaText = firstLines.slice(0, 6).join(" ");
@@ -696,13 +711,13 @@ function descriptionMarkdown(carousel) {
     "",
     `A ideia aqui é simples: ${idea}`,
     "",
-    ...(points.length ? ["Neste carrossel:", ...points.map((point) => `- ${point}`), ""] : []),
+    ...(points.length ? ["In this carousel:", ...points.map((point) => `- ${point}`), ""] : []),
     closing,
   ];
   return [
-    `# Carrossel ${carousel.number} - ${cleanLine(carousel.title)}`,
+    `# Carousel ${carousel.number} - ${cleanLine(carousel.title)}`,
     "",
-    "## Legenda",
+    "## Caption",
     "",
     ...caption,
     "",
@@ -710,29 +725,32 @@ function descriptionMarkdown(carousel) {
     "",
     DEFAULT_HASHTAGS,
     "",
-    "## Observacao",
+    "## Notes",
     "",
-    "Legenda gerada automaticamente a partir do Slides.md. Revisar antes de postar se quiser ajustar a voz final.",
+    "Caption generated automatically from Slides.md. Review it before publishing and adjust the final voice when needed.",
     "",
   ].join("\n");
 }
 
-async function renderPng(html, outputPath) {
+async function renderPng(html, outputPath, canvas) {
   const { chromium } = require("playwright");
   const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: SIZE, height: SIZE }, deviceScaleFactor: 1 });
+  const page = await browser.newPage({ viewport: { width: canvas.width, height: canvas.height }, deviceScaleFactor: 1 });
   await page.setContent(html, { waitUntil: "networkidle" });
-  await page.screenshot({ path: outputPath, clip: { x: 0, y: 0, width: SIZE, height: SIZE } });
+  await page.screenshot({ path: outputPath, clip: { x: 0, y: 0, width: canvas.width, height: canvas.height } });
   await browser.close();
 }
 
 async function main() {
   const args = parseArgs(process.argv);
   const parsed = JSON.parse(fs.readFileSync(args.parsedJson, "utf8"));
+  const canvas = FORMAT_OPTIONS[args.format];
   const logoDataUrl = assetDataUrl("assets/instagram/serie-chatgpt-work/logo/aia-platform-logo.png");
   const report = {
     outputRoot: args.outputRoot,
     htmlOnly: args.htmlOnly,
+    format: args.format,
+    dimensions: [canvas.width, canvas.height],
     generated: [],
   };
 
@@ -740,22 +758,22 @@ async function main() {
     if (args.limitCarousel && carousel.number !== args.limitCarousel) {
       continue;
     }
-    const carouselDir = path.join(args.outputRoot, `Carrossel ${carousel.number}`);
+    const carouselDir = path.join(args.outputRoot, `Carousel ${carousel.number}`);
     const slidesDir = path.join(carouselDir, "slides");
     ensureDir(slidesDir);
 
-    const descriptionPath = path.join(carouselDir, "Descricao.md");
+    const descriptionPath = path.join(carouselDir, "Description.md");
     if (!fs.existsSync(descriptionPath)) {
       fs.writeFileSync(descriptionPath, descriptionMarkdown(carousel), "utf8");
     }
 
     for (const slide of carousel.slides || []) {
-      const html = renderSlide(carousel, slide, logoDataUrl);
+      const html = renderSlide(carousel, slide, logoDataUrl, canvas);
       const htmlPath = path.join(slidesDir, `slide-${String(slide.number).padStart(2, "0")}.html`);
       const pngPath = path.join(slidesDir, `slide-${String(slide.number).padStart(2, "0")}.png`);
       fs.writeFileSync(htmlPath, html, "utf8");
       if (!args.htmlOnly) {
-        await renderPng(html, pngPath);
+        await renderPng(html, pngPath, canvas);
       }
       report.generated.push({
         carousel: carousel.number,

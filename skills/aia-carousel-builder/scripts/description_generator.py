@@ -51,7 +51,7 @@ def title_from_carousel(carousel: dict[str, Any]) -> str:
     title = clean_line(str(carousel.get("title", "")))
     if title:
         return normalize_sentence(title)
-    return f"Carrossel {carousel.get('number', '')}".strip()
+    return f"Carousel {carousel.get('number', '')}".strip()
 
 
 def slide_takeaway(slide: dict[str, Any]) -> str:
@@ -128,7 +128,7 @@ def description_markdown(carousel: dict[str, Any]) -> str:
         "",
     ]
     if points:
-        caption_lines.append("Neste carrossel:")
+        caption_lines.append("In this carousel:")
         for point in points:
             caption_lines.append(f"- {point}")
         caption_lines.append("")
@@ -136,9 +136,9 @@ def description_markdown(carousel: dict[str, Any]) -> str:
 
     return "\n".join(
         [
-            f"# Carrossel {carousel['number']} - {clean_line(str(carousel.get('title', '')))}",
+            f"# Carousel {carousel['number']} - {clean_line(str(carousel.get('title', '')))}",
             "",
-            "## Legenda",
+            "## Caption",
             "",
             *caption_lines,
             "",
@@ -146,9 +146,9 @@ def description_markdown(carousel: dict[str, Any]) -> str:
             "",
             DEFAULT_HASHTAGS,
             "",
-            "## Observacao",
+            "## Notes",
             "",
-            "Legenda gerada automaticamente a partir do Slides.md. Revisar antes de postar se quiser ajustar a voz final.",
+            "Caption generated automatically from Slides.md. Review it before publishing and adjust the final voice when needed.",
             "",
         ]
     )

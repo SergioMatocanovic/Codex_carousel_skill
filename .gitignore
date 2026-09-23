@@ -4,5 +4,4 @@ __pycache__/
 parsed-slides.json
 generation-report.json
 validation-report.json
-description-docx-report.json
 visual-review-contact-sheet.png

@@ -13,7 +13,7 @@ from description_generator import description_markdown
 
 
 CAROUSEL_RE = re.compile(
-    r"^(?:#{1,6}\s*)?Carrossel\s+(\d+)(?:\s*[-:–—]\s*(.+?))?\s*$",
+    r"^(?:#{1,6}\s*)?Carousel\s+(\d+)(?:\s*[-:–—]\s*(.+?))?\s*$",
     re.IGNORECASE,
 )
 SLIDE_RE = re.compile(
@@ -210,11 +210,11 @@ def write_json(data: dict[str, Any], output_path: Path) -> None:
 
 def scaffold_output(data: dict[str, Any], root: Path, create_descriptions: bool) -> None:
     for carousel in data["carousels"]:
-        carousel_dir = root / f"Carrossel {carousel['number']}"
+        carousel_dir = root / f"Carousel {carousel['number']}"
         slides_dir = carousel_dir / "slides"
         slides_dir.mkdir(parents=True, exist_ok=True)
         if create_descriptions:
-            description_path = carousel_dir / "Descricao.md"
+            description_path = carousel_dir / "Description.md"
             if not description_path.exists():
                 description_path.write_text(
                     description_markdown(carousel),
@@ -235,12 +235,12 @@ def main() -> int:
     parser.add_argument(
         "--scaffold",
         type=Path,
-        help="Root folder for Carrossel N folders.",
+        help="Root folder for Carousel N folders.",
     )
     parser.add_argument(
         "--create-descriptions",
         action="store_true",
-        help="Create Descricao.md placeholders when using --scaffold.",
+        help="Create Description.md files when using --scaffold.",
     )
     parser.add_argument(
         "--fail-on-warning",

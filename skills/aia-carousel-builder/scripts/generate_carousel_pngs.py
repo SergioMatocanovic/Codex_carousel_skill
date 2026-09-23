@@ -13,9 +13,10 @@ from typing import Any
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 from description_generator import description_markdown
+from formats import CanvasFormat, format_choices, get_format
 
 
-SIZE = 1254
+BASE_SIZE = 1254
 WHITE = (248, 250, 255, 255)
 MUTED = (165, 170, 185, 255)
 CYAN = (0, 239, 245, 255)
@@ -25,8 +26,17 @@ PURPLE = (221, 82, 255, 255)
 
 
 def font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
-    name = "DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf"
-    return ImageFont.truetype(name, size)
+    candidates = (
+        ("DejaVuSans-Bold.ttf", "arialbd.ttf", "Arial Bold.ttf")
+        if bold
+        else ("DejaVuSans.ttf", "arial.ttf", "Arial.ttf")
+    )
+    for name in candidates:
+        try:
+            return ImageFont.truetype(name, size)
+        except OSError:
+            continue
+    return ImageFont.load_default(size=size)
 
 
 def text_size(draw: ImageDraw.ImageDraw, text: str, fnt: ImageFont.FreeTypeFont) -> tuple[int, int]:
@@ -140,18 +150,18 @@ def draw_icon(draw: ImageDraw.ImageDraw, center: tuple[int, int], marker: str, c
 
 
 def background() -> Image.Image:
-    img = Image.new("RGBA", (SIZE, SIZE), DARK)
+    img = Image.new("RGBA", (BASE_SIZE, BASE_SIZE), DARK)
     pixels = img.load()
-    for y in range(SIZE):
-        for x in range(SIZE):
-            nx = x / SIZE
-            ny = y / SIZE
+    for y in range(BASE_SIZE):
+        for x in range(BASE_SIZE):
+            nx = x / BASE_SIZE
+            ny = y / BASE_SIZE
             glow = max(0, 1 - math.hypot(nx - 0.78, ny - 0.72) / 0.42)
             teal = int(44 * glow)
             blue = int(34 * (1 - ny) + 34 * glow)
             pixels[x, y] = (2, 7 + int(12 * nx), 18 + blue + teal, 255)
 
-    overlay = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
+    overlay = Image.new("RGBA", (BASE_SIZE, BASE_SIZE), (0, 0, 0, 0))
     od = ImageDraw.Draw(overlay)
     for x in range(770, 1200, 22):
         for y in range(135, 720, 22):
@@ -160,11 +170,11 @@ def background() -> Image.Image:
                 od.ellipse((x, y, x + 2, y + 2), fill=(0, 239, 245, alpha))
     img.alpha_composite(overlay)
 
-    vignette = Image.new("L", (SIZE, SIZE), 0)
+    vignette = Image.new("L", (BASE_SIZE, BASE_SIZE), 0)
     vd = ImageDraw.Draw(vignette)
-    vd.ellipse((-260, -180, SIZE + 260, SIZE + 180), fill=180)
+    vd.ellipse((-260, -180, BASE_SIZE + 260, BASE_SIZE + 180), fill=180)
     vignette = vignette.filter(ImageFilter.GaussianBlur(120))
-    dark = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 160))
+    dark = Image.new("RGBA", (BASE_SIZE, BASE_SIZE), (0, 0, 0, 160))
     img = Image.composite(img, dark, Image.eval(vignette, lambda p: 255 - p))
     return img
 
@@ -179,7 +189,7 @@ def draw_header(draw: ImageDraw.ImageDraw, part: int) -> None:
         draw.rounded_rectangle((x, y, x + 58, y + 30), radius=5, fill=fill)
         x += 76
     draw.text((1025, y), f"Parte {part}/4", font=font(30, False), fill=WHITE)
-    draw.line((0, 106, SIZE, 106), fill=(0, 239, 245, 100), width=1)
+    draw.line((0, 106, BASE_SIZE, 106), fill=(0, 239, 245, 100), width=1)
 
 
 def draw_footer(img: Image.Image, logo_path: Path, cover: bool = False) -> None:
@@ -505,6 +515,7 @@ def draw_slide(
     slide: dict[str, Any],
     logo_path: Path,
     symbol_panel_path: Path,
+    canvas: CanvasFormat,
     output_path: Path,
 ) -> None:
     img = background()
@@ -537,7 +548,8 @@ def draw_slide(
         draw_footer(img, logo_path)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    img.convert("RGB").save(output_path, "PNG")
+    rendered = img.resize((canvas.width, canvas.height), Image.Resampling.LANCZOS)
+    rendered.convert("RGB").save(output_path, "PNG")
 
 
 def generate(
@@ -546,20 +558,27 @@ def generate(
     logo_path: Path,
     symbol_panel_path: Path,
     limit_carousel: int | None,
+    format_key: str,
 ) -> dict[str, Any]:
-    report: dict[str, Any] = {"output_root": str(output_root), "generated": []}
+    canvas = get_format(format_key)
+    report: dict[str, Any] = {
+        "output_root": str(output_root),
+        "format": canvas.key,
+        "dimensions": [canvas.width, canvas.height],
+        "generated": [],
+    }
     for carousel in parsed.get("carousels", []):
         if limit_carousel is not None and carousel["number"] != limit_carousel:
             continue
-        carousel_dir = output_root / f"Carrossel {carousel['number']}"
+        carousel_dir = output_root / f"Carousel {carousel['number']}"
         slides_dir = carousel_dir / "slides"
         slides_dir.mkdir(parents=True, exist_ok=True)
-        description_path = carousel_dir / "Descricao.md"
+        description_path = carousel_dir / "Description.md"
         if not description_path.exists():
             description_path.write_text(description_markdown(carousel), encoding="utf-8")
         for slide in carousel.get("slides", []):
             output_path = slides_dir / f"slide-{slide['number']:02d}.png"
-            draw_slide(carousel, slide, logo_path, symbol_panel_path, output_path)
+            draw_slide(carousel, slide, logo_path, symbol_panel_path, canvas, output_path)
             report["generated"].append(
                 {
                     "carousel": carousel["number"],
@@ -587,11 +606,12 @@ def main() -> int:
         / "assets/instagram/serie-chatgpt-work/extracted/right-symbol-panel.png",
     )
     parser.add_argument("--carousel", type=int, help="Generate only one carousel number")
+    parser.add_argument("--format", required=True, choices=format_choices(), help="Selected Instagram canvas format")
     parser.add_argument("--output-json", type=Path, help="Where to write generation report")
     args = parser.parse_args()
 
     parsed = json.loads(args.parsed_json.read_text(encoding="utf-8"))
-    report = generate(parsed, args.output_root, args.logo, args.symbol_panel, args.carousel)
+    report = generate(parsed, args.output_root, args.logo, args.symbol_panel, args.carousel, args.format)
 
     if args.output_json:
         args.output_json.parent.mkdir(parents=True, exist_ok=True)
