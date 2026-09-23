@@ -1,6 +1,6 @@
-# Instagram Carousel Design System
+# Optional AIA ChatGPT Work Example
 
-Use this reference for the **ChatGPT Work Series** Instagram carousel module.
+Use this reference only when the user explicitly requests the **AIA ChatGPT Work Series** style or provides its related assets. It is an example, not the default identity for Carousel Builder.
 
 ## Source assets
 

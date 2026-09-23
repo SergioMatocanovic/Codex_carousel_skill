@@ -145,7 +145,7 @@ def create_sheet(
 
     sheet = Image.new("RGB", (width, height), BG)
     draw = ImageDraw.Draw(sheet)
-    draw.text((margin, 24), "AIA Visual Review Sheet", font=font(34, True), fill=WHITE)
+    draw.text((margin, 24), "Carousel Visual Review Sheet", font=font(34, True), fill=WHITE)
     draw.text(
         (margin, 66),
         f"Root: {output_root}",

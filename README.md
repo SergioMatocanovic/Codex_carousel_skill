@@ -1,14 +1,20 @@
-# AIA Carousel Builder
+# Carousel Builder
 
-Reusable skill for creating and validating branded Plataforma AIA visual assets. The first module generates Instagram carousel PNGs from `Slides.md`, including an editable Markdown caption for every carousel.
+Reusable skill for creating and validating social-media carousel assets from `Slides.md`, a visual reference, or a brand brief. It can use an existing identity or create a starter visual profile for users who do not have one.
 
 ## Skill location
 
-The installable skill is in [skills/aia-carousel-builder](skills/aia-carousel-builder). This is the single source of truth for both Codex and ChatGPT Work.
+The installable skill is in [skills/carousel-builder](skills/carousel-builder). This is the single source of truth for both Codex and ChatGPT Work.
 
 ## Quick help
 
-After installation, write `/skill/help` in a task to receive the installation and usage guide. This is a skill convention recognized by AIA Carousel Builder, not a native slash command in ChatGPT or Codex.
+After installation, write `/skill/help` in a task to receive the installation and usage guide. This is a skill convention recognized by Carousel Builder, not a native slash command in ChatGPT or Codex.
+
+## Brand profile
+
+Choose one of three paths before generation: provide an existing visual identity, describe the business and desired tone, or ask the skill to create a starter profile. When it creates the profile, it proposes the color palette, typography direction, layout rules, and image direction in `BrandProfile.md` for approval before final PNG generation.
+
+The bundled AIA files are an optional example only. They are never used unless that style is explicitly requested.
 
 ## Canvas selection
 
@@ -24,36 +30,36 @@ Vertical Principal is the recommended format.
 
 ## Install in Codex
 
-Ask Codex to install the skill from this repository using the path `skills/aia-carousel-builder`. The installer places it in the local Codex skills directory and it becomes available in the next task.
+Ask Codex to install the skill from this repository using the path `skills/carousel-builder`. The installer places it in the local Codex skills directory and it becomes available in the next task.
 
 ## Install in ChatGPT Work
 
-Create a ZIP containing the contents of `skills/aia-carousel-builder`, with `SKILL.md` at the ZIP root. Then go to **Plugins → Skills → Create → Upload from your computer** and upload the ZIP. After the scan, install or share it from the Skills page.
+Create a ZIP containing the contents of `skills/carousel-builder`, with `SKILL.md` at the ZIP root. Then go to **Plugins → Skills → Create → Upload from your computer** and upload the ZIP. After the scan, install or share it from the Skills page.
 
 ## Requirements
 
 Use Python 3.10 or later and install the dependencies from the skill folder:
 
 ```bash
-python -m pip install -r skills/aia-carousel-builder/requirements.txt
+python -m pip install -r skills/carousel-builder/requirements.txt
 ```
 
 ## Local usage
 
 ```bash
-python skills/aia-carousel-builder/scripts/parse_slides.py Slides.md \
+python skills/carousel-builder/scripts/parse_slides.py Slides.md \
   --output-json parsed-slides.json \
-  --scaffold "Social Media/Instagram/ChatGPT Work Series" \
+  --scaffold "Social Media/Instagram/Carousel Series" \
   --create-descriptions
 
-python skills/aia-carousel-builder/scripts/generate_carousel_pngs.py \
+python skills/carousel-builder/scripts/generate_carousel_pngs.py \
   --parsed-json parsed-slides.json \
-  --output-root "Social Media/Instagram/ChatGPT Work Series" \
+  --output-root "Social Media/Instagram/Carousel Series" \
   --format vertical-principal \
   --output-json generation-report.json
 
-python skills/aia-carousel-builder/scripts/validate_carousel_output.py \
-  "Social Media/Instagram/ChatGPT Work Series" \
+python skills/carousel-builder/scripts/validate_carousel_output.py \
+  "Social Media/Instagram/Carousel Series" \
   --parsed-json parsed-slides.json \
   --format vertical-principal \
   --output-json validation-report.json

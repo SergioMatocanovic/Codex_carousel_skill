@@ -7,7 +7,7 @@ import re
 from typing import Any
 
 
-DEFAULT_HASHTAGS = "#chatgpt #inteligenciaartificial #chatgptwork #plataformaaia #produtividade"
+DEFAULT_HASHTAGS = "#carousel #socialmedia #contentcreation #design #marketing"
 CTA_MARKERS = ("❤️", "📤", "📌")
 CHECK_MARKERS = ("✅", "✔")
 
@@ -42,7 +42,7 @@ def normalize_sentence(text: str) -> str:
 
 def content_without_series(slide: dict[str, Any]) -> list[str]:
     lines = slide.get("content_lines", [])
-    if lines and re.match(r"S[eé]rie\s+ChatGPT Work", lines[0], re.IGNORECASE):
+    if lines and re.match(r"(?:Series|S[eé]rie)\s+", lines[0], re.IGNORECASE):
         return lines[1:]
     return lines
 

@@ -71,7 +71,7 @@ def leading_marker(line: str) -> str:
 def is_accent_line(line: str) -> bool:
     return bool(
         re.search(
-            r"ChatGPT|Claude|AIA|delegar|trabalho|funcion[aá]rio|mudou|chatbot|Google|Docker|VS|5 tipos|Agora|Parte",
+            r"important|key|highlight|insight|result|strategy|tip|vs|before|after|part",
             line,
             re.IGNORECASE,
         )
@@ -181,21 +181,21 @@ def background() -> Image.Image:
 
 def draw_header(draw: ImageDraw.ImageDraw, part: int) -> None:
     y = 42
-    draw.text((43, y), "SÉRIE", font=font(30, True), fill=WHITE)
-    draw.text((142, y), "CHATGPT WORK", font=font(30, True), fill=CYAN)
+    draw.text((43, y), "SERIES", font=font(30, True), fill=WHITE)
+    draw.text((172, y), "CAROUSEL", font=font(30, True), fill=CYAN)
     x = 480
     for index in range(1, 5):
         fill = CYAN if index == part else (45, 52, 68, 255)
         draw.rounded_rectangle((x, y, x + 58, y + 30), radius=5, fill=fill)
         x += 76
-    draw.text((1025, y), f"Parte {part}/4", font=font(30, False), fill=WHITE)
+    draw.text((1025, y), f"Part {part}/4", font=font(30, False), fill=WHITE)
     draw.line((0, 106, BASE_SIZE, 106), fill=(0, 239, 245, 100), width=1)
 
 
-def draw_footer(img: Image.Image, logo_path: Path, cover: bool = False) -> None:
+def draw_footer(img: Image.Image, logo_path: Path | None, cover: bool = False) -> None:
     draw = ImageDraw.Draw(img)
     if cover:
-        draw.text((64, 1180), "@sergiomatocanovic", font=font(28, False), fill=MUTED)
+        draw.text((64, 1180), "YOUR HANDLE", font=font(28, False), fill=MUTED)
         return
     draw.line((15, 1108, 1238, 1108), fill=(0, 239, 245, 90), width=1)
     try:
@@ -203,9 +203,9 @@ def draw_footer(img: Image.Image, logo_path: Path, cover: bool = False) -> None:
         logo.thumbnail((180, 82), Image.LANCZOS)
         img.alpha_composite(logo, (50, 1130))
     except Exception:
-        draw.text((50, 1140), "AIA", font=font(60, True), fill=CYAN)
+        draw.text((50, 1140), "BRAND", font=font(42, True), fill=CYAN)
     draw.line((275, 1135, 275, 1210), fill=(0, 239, 245, 110), width=1)
-    draw.text((322, 1160), "@sergiomatocanovic", font=font(29, False), fill=MUTED)
+    draw.text((322, 1160), "YOUR HANDLE", font=font(29, False), fill=MUTED)
     draw.ellipse((1093, 1140, 1173, 1220), outline=CYAN, width=2)
     draw.text((1114, 1144), "→", font=font(56, False), fill=CYAN)
 
@@ -224,7 +224,7 @@ def draw_ai_mark_fallback(draw: ImageDraw.ImageDraw) -> None:
     draw.rounded_rectangle((970, 520, 1190, 740), radius=38, outline=(0, 239, 245, 230), width=30)
 
 
-def draw_ai_mark(img: Image.Image, draw: ImageDraw.ImageDraw, symbol_panel_path: Path) -> None:
+def draw_ai_mark(img: Image.Image, draw: ImageDraw.ImageDraw, symbol_panel_path: Path | None) -> None:
     try:
         panel = Image.open(symbol_panel_path).convert("RGBA")
         alpha = panel.getchannel("A")
@@ -250,7 +250,7 @@ def draw_ai_mark(img: Image.Image, draw: ImageDraw.ImageDraw, symbol_panel_path:
 
 def content_without_series(slide: dict[str, Any]) -> list[str]:
     lines = slide.get("content_lines", [])
-    if lines and re.match(r"S[eé]rie\s+ChatGPT Work", lines[0], re.IGNORECASE):
+    if lines and re.match(r"(?:Series|S[eé]rie)\s+", lines[0], re.IGNORECASE):
         return lines[1:]
     return lines
 
@@ -446,8 +446,8 @@ def draw_centered_line(
 def draw_comparison_final(draw: ImageDraw.ImageDraw, cleaned: list[str]) -> None:
     next_part = next((line for line in cleaned if re.search(r"Na Parte", line, re.IGNORECASE)), cleaned[0])
     options = [line for line in cleaned if line.lower() not in {"vs", "versus"} and line != next_part]
-    first = options[0] if options else "ChatGPT Work"
-    second = options[1] if len(options) > 1 else "Claude Cowork"
+    first = options[0] if options else "Option One"
+    second = options[1] if len(options) > 1 else "Option Two"
 
     draw_icon(draw, (132, 270), "»", CYAN)
     draw_wrapped_lines(draw, [next_part], 245, 238, 490, 54, 5, True)
@@ -513,8 +513,8 @@ def draw_quote_or_text(draw: ImageDraw.ImageDraw, lines: list[str], slide_number
 def draw_slide(
     carousel: dict[str, Any],
     slide: dict[str, Any],
-    logo_path: Path,
-    symbol_panel_path: Path,
+    logo_path: Path | None,
+    symbol_panel_path: Path | None,
     canvas: CanvasFormat,
     output_path: Path,
 ) -> None:
@@ -555,8 +555,8 @@ def draw_slide(
 def generate(
     parsed: dict[str, Any],
     output_root: Path,
-    logo_path: Path,
-    symbol_panel_path: Path,
+    logo_path: Path | None,
+    symbol_panel_path: Path | None,
     limit_carousel: int | None,
     format_key: str,
 ) -> dict[str, Any]:
@@ -596,14 +596,12 @@ def main() -> int:
     parser.add_argument(
         "--logo",
         type=Path,
-        default=Path(__file__).resolve().parent.parent
-        / "assets/instagram/serie-chatgpt-work/logo/aia-platform-logo.png",
+        help="Optional logo image for internal slides",
     )
     parser.add_argument(
         "--symbol-panel",
         type=Path,
-        default=Path(__file__).resolve().parent.parent
-        / "assets/instagram/serie-chatgpt-work/extracted/right-symbol-panel.png",
+        help="Optional visual panel image for the right side of slides",
     )
     parser.add_argument("--carousel", type=int, help="Generate only one carousel number")
     parser.add_argument("--format", required=True, choices=format_choices(), help="Selected Instagram canvas format")

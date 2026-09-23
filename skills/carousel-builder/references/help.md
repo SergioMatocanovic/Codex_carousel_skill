@@ -1,10 +1,10 @@
-# AIA Carousel Builder Help
+# Carousel Builder Help
 
 ## Installation
 
 ### Codex
 
-Install the skill from this repository using the path `skills/aia-carousel-builder`. Start a new Codex task after installation so the skill is available.
+Install the skill from this repository using the path `skills/carousel-builder`. Start a new Codex task after installation so the skill is available.
 
 ### ChatGPT Work
 
@@ -13,6 +13,8 @@ Create a ZIP whose root contains `SKILL.md`, `assets`, `references`, `scripts`, 
 ## Usage
 
 Provide a `Slides.md` file with headings such as `# Carousel 1` and `## Slide 1`.
+
+Choose a brand mode first: provide an existing visual reference, describe a brand brief, or ask the skill to create a starter profile and confirm it before final generation.
 
 Choose one canvas format before generation:
 
@@ -25,5 +27,5 @@ The output includes sortable PNG slides and a `Description.md` caption file for 
 ## Example request
 
 ```text
-Use this Slides.md to generate an Instagram carousel in Vertical Principal format.
+Create a starter brand profile for my financial education audience, then use this Slides.md to generate an Instagram carousel in Vertical Principal format.
 ```

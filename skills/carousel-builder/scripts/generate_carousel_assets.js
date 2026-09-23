@@ -11,7 +11,7 @@ const FORMAT_OPTIONS = {
   square: { width: 1080, height: 1080 },
 };
 const DEFAULT_HASHTAGS =
-  "#chatgpt #inteligenciaartificial #chatgptwork #plataformaaia #produtividade";
+  "#carousel #socialmedia #contentcreation #design #marketing";
 
 function parseArgs(argv) {
   const args = {
@@ -58,7 +58,7 @@ function printHelp() {
   console.log(`Usage:
 node scripts/generate_carousel_assets.js \\
   --parsed-json parsed-slides.json \\
-  --output-root "Redes Sociais/Instagram/Serie ChatGPT Work" \\
+  --output-root "Social Media/Instagram/Carousel Series" \\
   --format vertical-principal
 
 Options:
@@ -94,7 +94,7 @@ function firstContentLine(slide) {
 
 function contentWithoutSeriesLine(slide) {
   const lines = slide.content_lines || [];
-  if (lines[0] && /^S[eé]rie\s+ChatGPT Work/i.test(lines[0])) {
+  if (lines[0] && /^(?:Series|S[eé]rie)\s+/i.test(lines[0])) {
     return lines.slice(1);
   }
   return lines;
@@ -103,7 +103,7 @@ function contentWithoutSeriesLine(slide) {
 function highlightText(text) {
   const escaped = escapeHtml(text);
   return escaped.replace(
-    /(ChatGPT Work|ChatGPT|Claude Cowork|Claude|AIA|funcion[aá]rio|delegar|trabalho|mudou|chatbot|sair na frente|respostas?|pergunta|Google|Docker|VS|5 tipos)/gi,
+    /(important|key|highlight|insight|result|strategy|tip|vs|before|after|part)/gi,
     '<span class="accent">$1</span>',
   );
 }
@@ -138,7 +138,7 @@ function header(carouselNumber) {
     .join("");
   return `
     <div class="header">
-      <div class="series"><span>SÉRIE</span> <strong>CHATGPT WORK</strong></div>
+      <div class="series"><span>SERIES</span> <strong>CAROUSEL</strong></div>
       <div class="progress">${bars}</div>
       <div class="part">Parte ${carouselNumber}/4</div>
     </div>
@@ -149,9 +149,9 @@ function footer(logoDataUrl, withLogo = true) {
   return `
     <div class="footer">
       <div class="footer-left">
-        ${withLogo ? `<img class="aia-logo" src="${logoDataUrl}" alt="Plataforma AIA" />` : ""}
+        ${withLogo && logoDataUrl ? `<img class="brand-logo" src="${logoDataUrl}" alt="Brand logo" />` : ""}
         <span class="divider"></span>
-        <span class="handle">@sergiomatocanovic</span>
+        <span class="handle">YOUR HANDLE</span>
       </div>
       <div class="next-arrow">→</div>
     </div>
@@ -412,7 +412,7 @@ function css(canvas) {
       gap: 36px;
       height: 82px;
     }
-    .aia-logo {
+    .brand-logo {
       width: 172px;
       max-height: 74px;
       object-fit: contain;
@@ -667,7 +667,7 @@ function descriptionMarkdown(carousel) {
   };
   const contentWithoutSeries = (slide) => {
     const lines = slide.content_lines || [];
-    if (lines[0] && /^S[eé]rie\s+ChatGPT Work/i.test(lines[0])) return lines.slice(1);
+    if (lines[0] && /^(?:Series|S[eé]rie)\s+/i.test(lines[0])) return lines.slice(1);
     return lines;
   };
   const title = normalizeSentence(carousel.title || `Carousel ${carousel.number}`);
@@ -745,7 +745,7 @@ async function main() {
   const args = parseArgs(process.argv);
   const parsed = JSON.parse(fs.readFileSync(args.parsedJson, "utf8"));
   const canvas = FORMAT_OPTIONS[args.format];
-  const logoDataUrl = assetDataUrl("assets/instagram/serie-chatgpt-work/logo/aia-platform-logo.png");
+  const logoDataUrl = null;
   const report = {
     outputRoot: args.outputRoot,
     htmlOnly: args.htmlOnly,
