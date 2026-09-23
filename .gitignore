@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+parsed-slides.json
+generation-report.json
+validation-report.json
+description-docx-report.json
+visual-review-contact-sheet.png
