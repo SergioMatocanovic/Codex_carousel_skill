@@ -6,6 +6,10 @@ Reusable skill for creating and validating branded Plataforma AIA visual assets.
 
 The installable skill is in [skills/aia-carousel-builder](skills/aia-carousel-builder). This is the single source of truth for both Codex and ChatGPT Work.
 
+## Quick help
+
+After installation, write `/skill/help` in a task to receive the installation and usage guide. This is a skill convention recognized by AIA Carousel Builder, not a native slash command in ChatGPT or Codex.
+
 ## Canvas selection
 
 The skill asks for one format before generation:

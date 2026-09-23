@@ -9,6 +9,19 @@ Create reusable Plataforma AIA visual assets from structured source content whil
 
 The first supported module is **Instagram Carousel Builder**. Future modules may include YouTube thumbnails, LinkedIn posts, Facebook assets, landing pages, and presentations.
 
+## Help, installation, and usage
+
+Treat `/skill/help` as a skill-level help request. It is a prompt convention, not a native ChatGPT or Codex slash command.
+
+When the user writes `/skill/help`, do not generate assets. Read [references/help.md](references/help.md) and return the concise installation and usage guide from that reference.
+
+When the user asks how to install the skill, explain both supported paths:
+
+* **Codex:** install the `skills/aia-carousel-builder` folder from the GitHub repository, then begin a new task.
+* **ChatGPT Work:** upload a ZIP whose root contains `SKILL.md`, `assets`, `references`, and `scripts` through Plugins → Skills → Create → Upload.
+
+For normal use, ask for `Slides.md` and the selected canvas format before generating assets.
+
 ## Core principles
 
 Preserve visual identity before adding novelty. The official reference defines typography, hierarchy, spacing, color, logo placement, background treatment, and visual rhythm.
