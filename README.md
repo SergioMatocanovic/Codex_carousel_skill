@@ -14,6 +14,12 @@ After installation, write `/skill/help` in a task to receive the installation an
 
 Choose one of three paths before generation: provide an existing visual identity, describe the business and desired tone, or ask the skill to create a starter profile. When it creates the profile, it proposes the color palette, typography direction, layout rules, and image direction in `BrandProfile.md` for approval before final PNG generation.
 
+## Theme-led image generation
+
+The standard workflow does not reuse a fixed visual model. It creates a `visual-plan.json` for the subject, then uses ChatGPT Images 2.5, when available in the workspace, to generate text-free source imagery that matches the plan. The compositor adds the exact carousel text, so the final slides do not depend on image-generation text accuracy.
+
+In ChatGPT Work, use the native image generator available in the conversation. For an API workflow, model and billing choices must be configured separately by the account owner.
+
 ## Canvas selection
 
 The skill asks for one format before generation:
@@ -50,8 +56,17 @@ python skills/carousel-builder/scripts/parse_slides.py Slides.md \
   --scaffold "Social Media/Instagram/Carousel Series" \
   --create-descriptions
 
-python skills/carousel-builder/scripts/generate_carousel_pngs.py \
+python skills/carousel-builder/scripts/create_image_prompts.py \
   --parsed-json parsed-slides.json \
+  --visual-plan visual-plan.json \
+  --output image-prompts.md
+
+# Generate the listed, text-free images in ChatGPT Images and save them in generated-images/.
+
+python skills/carousel-builder/scripts/compose_theme_carousel.py \
+  --parsed-json parsed-slides.json \
+  --visual-plan visual-plan.json \
+  --image-dir generated-images \
   --output-root "Social Media/Instagram/Carousel Series" \
   --format vertical-principal \
   --output-json generation-report.json

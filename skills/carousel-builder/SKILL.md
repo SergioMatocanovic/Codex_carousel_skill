@@ -28,6 +28,14 @@ Before generating assets, determine which brand mode applies:
 
 For a new profile, read [references/brand-profile.md](references/brand-profile.md). Ask for confirmation before generating final assets when the profile was inferred rather than supplied.
 
+## Autonomous visual direction
+
+Do not reuse a fixed visual template. Create a topic-specific `visual-plan.json` using the current brand profile, audience, theme, and canvas format. Read [references/visual-direction.md](references/visual-direction.md) for its compact schema.
+
+Choose which slides need generated imagery and write a specific `image_prompt` for each of them. The prompt must request a text-free source image, with no logo, watermark, UI, border, or typography. Use the generated image as visual material only; place the exact editorial copy with the compositor.
+
+In ChatGPT Work, use ChatGPT Images 2.5 when the workspace makes image generation available in the conversation. Do not claim to pin a specific API model in Work. If image generation is unavailable, create a typography-led carousel from the visual plan and state that limitation.
+
 ## Inputs
 
 Use these inputs when available:
@@ -67,29 +75,44 @@ python scripts/parse_slides.py Slides.md \
 
 Stop and fix parser errors before generation. Review warnings before continuing.
 
-### 2. Generate assets
+### 2. Plan and generate the source imagery
+
+Create `visual-plan.json`, then generate image prompts:
+
+```bash
+python scripts/create_image_prompts.py \
+  --parsed-json parsed-slides.json \
+  --visual-plan visual-plan.json \
+  --output image-prompts.md
+```
+
+Use ChatGPT Images to create the selected text-free images. Save them in `generated-images/` using the names in `image-prompts.md`. Do not generate images for every slide just to fill space: use typography-only slides where they communicate more clearly.
+
+### 3. Compose the final assets
 
 Use the selected format. Example:
 
 ```bash
-python scripts/generate_carousel_pngs.py \
+python scripts/compose_theme_carousel.py \
   --parsed-json parsed-slides.json \
+  --visual-plan visual-plan.json \
+  --image-dir generated-images \
   --output-root "Social Media/Instagram/Carousel Series" \
   --format vertical-principal \
   --output-json generation-report.json
 ```
 
-The generator creates PNG slides and `Description.md`. For HTML/CSS previews, use `scripts/generate_carousel_assets.js` with the same `--format` value.
+The compositor creates PNG slides and `Description.md`. It can also generate a clean typography-led fallback when no source image is present.
 
 Keep text within safe margins. Avoid tiny type, crowded blocks, clipped logos, and low contrast.
 
-### 3. Create Markdown descriptions
+### 4. Create Markdown descriptions
 
 Use one `Description.md` per carousel as the sole canonical caption source. Include a suggested caption, five hashtags unless another count is requested, and an optional publishing note.
 
 Do not create Word documents.
 
-### 4. Validate
+### 5. Validate
 
 ```bash
 python scripts/validate_carousel_output.py \

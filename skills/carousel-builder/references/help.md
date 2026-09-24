@@ -16,6 +16,8 @@ Provide a `Slides.md` file with headings such as `# Carousel 1` and `## Slide 1`
 
 Choose a brand mode first: provide an existing visual reference, describe a brand brief, or ask the skill to create a starter profile and confirm it before final generation.
 
+The skill creates a unique visual plan for the subject rather than reusing a fixed template. When available, use ChatGPT Images to make text-free source imagery from that plan. The final carousel text is composed separately for accuracy.
+
 Choose one canvas format before generation:
 
 1. Vertical Principal: `1080 x 1440 px`, `3:4`.
