@@ -34,7 +34,7 @@ Do not reuse a fixed visual template. Create a topic-specific `visual-plan.json`
 
 Choose which slides need generated imagery and write a specific `image_prompt` for each of them. The prompt must request a text-free source image, with no logo, watermark, UI, border, or typography. Use the generated image as visual material only; place the exact editorial copy with the compositor.
 
-In ChatGPT Work, use ChatGPT Images 2.5 when the workspace makes image generation available in the conversation. Do not claim to pin a specific API model in Work. If image generation is unavailable, create a typography-led carousel from the visual plan and state that limitation.
+In ChatGPT Work, use ChatGPT Images 2.5 when the workspace makes image generation available in the conversation. This workflow does not require an API key, API configuration, or separate API billing. If image generation is unavailable, create a typography-led carousel from the visual plan and state that limitation.
 
 ## Inputs
 

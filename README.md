@@ -18,7 +18,7 @@ Choose one of three paths before generation: provide an existing visual identity
 
 The standard workflow does not reuse a fixed visual model. It creates a `visual-plan.json` for the subject, then uses ChatGPT Images 2.5, when available in the workspace, to generate text-free source imagery that matches the plan. The compositor adds the exact carousel text, so the final slides do not depend on image-generation text accuracy.
 
-In ChatGPT Work, use the native image generator available in the conversation. For an API workflow, model and billing choices must be configured separately by the account owner.
+In ChatGPT Work, use the native image generator available in the conversation. This skill does not require an API key, API configuration, or separate API billing.
 
 ## Canvas selection
 
