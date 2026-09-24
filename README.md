@@ -44,7 +44,9 @@ Ask Codex to install the skill from this repository using the path `skills/carou
 
 ## Install in ChatGPT Work
 
-Create a ZIP containing the contents of `skills/carousel-builder`, with `SKILL.md` at the ZIP root. Then go to **Plugins → Skills → Create → Upload from your computer** and upload the ZIP. After the scan, install or share it from the Skills page.
+ChatGPT Work now distributes reusable workflows through **Plugins**. Download `carousel-builder-work.zip`, then open **Plugins → Create** and import the ZIP. The package root includes `plugin.json`, the Codex compatibility manifest, and `skills/carousel-builder`.
+
+After installation, start a new Work chat and describe the carousel you want. The plugin provides the bundled `carousel-builder` skill.
 
 ## Requirements
 

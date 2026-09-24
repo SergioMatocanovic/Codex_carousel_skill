@@ -1,0 +1,26 @@
+{
+  "name": "carousel-builder",
+  "version": "1.1.0",
+  "description": "Create structured social-media carousels from a topic or Slides.md.",
+  "author": {
+    "name": "Sergio Matocanovic",
+    "url": "https://github.com/SergioMatocanovic"
+  },
+  "homepage": "https://github.com/SergioMatocanovic/Codex_carousel_skill",
+  "repository": "https://github.com/SergioMatocanovic/Codex_carousel_skill",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Carousel Builder",
+    "shortDescription": "Crie carrosséis com direção visual e texto preciso.",
+    "longDescription": "Transforme um tema ou roteiro em um carrossel organizado, com direção visual, imagens de apoio e revisões no mesmo projeto.",
+    "developerName": "Sergio Matocanovic",
+    "category": "Productivity",
+    "capabilities": ["Skills"],
+    "defaultPrompt": [
+      "Crie um carrossel de 7 slides sobre meu tema.",
+      "Transforme esta ideia em um carrossel Vertical Principal.",
+      "Revise o Carousel 1 sem criar outro carrossel."
+    ],
+    "brandColor": "#0378A6"
+  }
+}

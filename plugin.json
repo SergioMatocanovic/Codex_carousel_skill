@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "carousel-builder",
+  "version": "1.1.0",
+  "description": "Create structured social-media carousels from a topic or Slides.md."
+}

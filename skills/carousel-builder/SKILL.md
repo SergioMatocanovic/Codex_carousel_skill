@@ -16,7 +16,7 @@ When the user writes `/skill/help`, do not generate assets. Read [references/hel
 For installation, explain both supported paths:
 
 * **Codex:** install the `skills/carousel-builder` folder from the GitHub repository, then begin a new task.
-* **ChatGPT Work:** upload a ZIP whose root contains `SKILL.md`, `references`, `scripts`, and `requirements.txt` through Plugins → Skills → Create → Upload.
+* **ChatGPT Work:** install the `carousel-builder` plugin through Plugins. Its package root contains `plugin.json`, `.codex-plugin/plugin.json`, and `skills/carousel-builder`.
 
 ## Brand profile
 
