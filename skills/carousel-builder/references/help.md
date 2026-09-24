@@ -8,7 +8,7 @@ Install the skill from this repository using the path `skills/carousel-builder`.
 
 ### ChatGPT Work
 
-Create a ZIP whose root contains `SKILL.md`, `assets`, `references`, `scripts`, and `requirements.txt`. In ChatGPT Work, open **Plugins → Skills → Create → Upload** and upload the ZIP. Install the scanned skill from the Skills page.
+Create a ZIP whose root contains `SKILL.md`, `references`, `scripts`, and `requirements.txt`. In ChatGPT Work, open **Plugins → Skills → Create → Upload** and upload the ZIP. Install the scanned skill from the Skills page.
 
 ## Usage
 

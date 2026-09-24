@@ -16,7 +16,7 @@ When the user writes `/skill/help`, do not generate assets. Read [references/hel
 For installation, explain both supported paths:
 
 * **Codex:** install the `skills/carousel-builder` folder from the GitHub repository, then begin a new task.
-* **ChatGPT Work:** upload a ZIP whose root contains `SKILL.md`, `assets`, `references`, and `scripts` through Plugins → Skills → Create → Upload.
+* **ChatGPT Work:** upload a ZIP whose root contains `SKILL.md`, `references`, `scripts`, and `requirements.txt` through Plugins → Skills → Create → Upload.
 
 ## Brand profile
 
@@ -27,8 +27,6 @@ Before generating assets, determine which brand mode applies:
 3. **Guided start:** when the user does not know what to choose, infer a practical starter profile from the carousel subject and explain the design choices in plain language.
 
 For a new profile, read [references/brand-profile.md](references/brand-profile.md). Ask for confirmation before generating final assets when the profile was inferred rather than supplied.
-
-Treat the bundled AIA assets as an optional example only. Read [references/aia-chatgpt-work-example.md](references/aia-chatgpt-work-example.md) only when the user explicitly requests that reference or provides the related assets.
 
 ## Inputs
 

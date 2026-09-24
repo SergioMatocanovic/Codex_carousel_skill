@@ -14,8 +14,6 @@ After installation, write `/skill/help` in a task to receive the installation an
 
 Choose one of three paths before generation: provide an existing visual identity, describe the business and desired tone, or ask the skill to create a starter profile. When it creates the profile, it proposes the color palette, typography direction, layout rules, and image direction in `BrandProfile.md` for approval before final PNG generation.
 
-The bundled AIA files are an optional example only. They are never used unless that style is explicitly requested.
-
 ## Canvas selection
 
 The skill asks for one format before generation:
