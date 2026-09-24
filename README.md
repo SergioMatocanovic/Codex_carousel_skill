@@ -1,6 +1,6 @@
 # Carousel Builder
 
-Reusable skill for creating and validating social-media carousel assets from `Slides.md`, a visual reference, or a brand brief. It can use an existing identity or create a starter visual profile for users who do not have one.
+Reusable skill for creating and validating social-media carousel assets from a topic, `Slides.md`, a visual reference, or a brand brief. It can use an existing identity or create a starter visual profile for users who do not have one.
 
 ## Skill location
 
@@ -9,6 +9,12 @@ The installable skill is in [skills/carousel-builder](skills/carousel-builder). 
 ## Quick help
 
 After installation, write `/skill/help` in a task to receive the installation and usage guide. This is a skill convention recognized by Carousel Builder, not a native slash command in ChatGPT or Codex.
+
+## Two ways to start
+
+**Describe the idea in conversation.** Give the skill a theme, audience, and desired tone. It proposes the slide sequence, creates a `Slides.md` working file after approval, and then produces the carousel.
+
+**Provide `Slides.md`.** This optional Markdown file is a screenplay for the carousel. Use it when you want to define the exact slide order and copy before generation. Start from [the complete seven-slide example](skills/carousel-builder/examples/Slides.example.md).
 
 ## Brand profile
 

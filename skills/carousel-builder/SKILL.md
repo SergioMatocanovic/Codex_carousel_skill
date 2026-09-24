@@ -1,6 +1,6 @@
 ---
 name: carousel-builder
-description: Create and validate social-media carousel assets from Slides.md, a visual reference, or a brand brief. Use for Instagram carousel generation, carousel visual reviews, PNG exports, Markdown captions, and creating a visual profile when the user does not yet have a brand system.
+description: Create and validate social-media carousel assets from a topic, a structured Slides.md file, a visual reference, or a brand brief. Use for Instagram carousel generation, carousel visual reviews, PNG exports, Markdown captions, and creating a visual profile when the user does not yet have a brand system.
 ---
 
 # Carousel Builder
@@ -40,10 +40,20 @@ In ChatGPT Work, use ChatGPT Images 2.5 when the workspace makes image generatio
 
 Use these inputs when available:
 
-* `Slides.md`: source content with one or more carousels and slides.
+* Theme or brief: a topic described in the conversation.
+* `Slides.md`: optional source content with one or more carousels and slides.
 * Brand assets or visual reference: logo, palette, fonts, templates, or previous posts.
 * Brand profile: supplied or created during onboarding.
 * Output target: Instagram by default unless another channel is requested.
+
+## Choose the content path
+
+The user does not need to arrive with a `Slides.md` file.
+
+* **Topic in conversation:** turn the approved theme into a concise `Slides.md` draft in the project root. Show the slide sequence and get content approval before producing final PNGs.
+* **Existing `Slides.md`:** use it as the source of truth. Preserve its carousel and slide numbering.
+
+`Slides.md` is simply a Markdown screenplay for the carousel, not a special application file. Read [examples/Slides.example.md](examples/Slides.example.md) when the user needs a starting point or asks what the format looks like.
 
 ## Output hierarchy and revisions
 
@@ -66,6 +76,8 @@ Use one command value in every generator and validation command: `vertical-princ
 ## Workflow
 
 ### 1. Parse content
+
+If the user provided only a topic, first create a draft `Slides.md` from the agreed content direction. If the user supplied the file, parse it directly.
 
 Use `Carousel` and `Slide` headings:
 

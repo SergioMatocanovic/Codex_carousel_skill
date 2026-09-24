@@ -12,7 +12,11 @@ Create a ZIP whose root contains `SKILL.md`, `references`, `scripts`, and `requi
 
 ## Usage
 
-Provide a `Slides.md` file with headings such as `# Carousel 1` and `## Slide 1`.
+Start with either a theme in the conversation or your own `Slides.md` file.
+
+If you provide only a theme, the skill proposes the slide sequence and creates a `Slides.md` working file after you approve the content direction. You do not need to know Markdown to start.
+
+`Slides.md` is optional. It is simply a Markdown screenplay for people who want to control the exact slide order and copy. It uses headings such as `# Carousel 1` and `## Slide 1`. See [examples/Slides.example.md](../examples/Slides.example.md) for a complete seven-slide example.
 
 Choose a brand mode first: provide an existing visual reference, describe a brand brief, or ask the skill to create a starter profile and confirm it before final generation.
 
@@ -31,5 +35,5 @@ The project root also contains `historico.md`, which records each carousel's dat
 ## Example request
 
 ```text
-Create a starter brand profile for my financial education audience, then use this Slides.md to generate an Instagram carousel in Vertical Principal format.
+Create a starter brand profile for my financial education audience and make a seven-slide Instagram carousel about building an emergency fund, in Vertical Principal format.
 ```
