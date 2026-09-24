@@ -6,7 +6,9 @@ from __future__ import annotations
 import argparse
 import json
 import textwrap
+from datetime import date
 from pathlib import Path
+from shutil import copy2
 from typing import Any
 
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont
@@ -125,6 +127,49 @@ def compose_slide(carousel: dict[str, Any], slide: dict[str, Any], plan: dict[st
     return str(source) if source else None
 
 
+def archive_source_image(source: str | None, carousel_dir: Path) -> str | None:
+    if not source:
+        return None
+    original = Path(source)
+    archive = carousel_dir / "generated-images" / original.name
+    archive.parent.mkdir(parents=True, exist_ok=True)
+    copy2(original, archive)
+    return str(archive)
+
+
+def table_cell(value: str) -> str:
+    return value.replace("|", "/").replace("\n", " ").strip()
+
+
+def update_history(root: Path, carousel: dict[str, Any], mode: str) -> None:
+    history = root / "historico.md"
+    today = date.today().isoformat()
+    key = f"Carousel {carousel['number']}"
+    title = table_cell(str(carousel.get("title") or "Sem tema"))
+    slides = str(len(carousel.get("slides", [])))
+    header = [
+        "# Histórico de carrosséis",
+        "",
+        "| Carrossel | Criado em | Atualizado em | Tema | Slides | Status |",
+        "| --- | --- | --- | --- | ---: | --- |",
+    ]
+    lines = history.read_text(encoding="utf-8").splitlines() if history.exists() else header
+    entry_prefix = f"| {key} |"
+    replacement = f"| {key} | {today} | {today} | {title} | {slides} | {'Criado' if mode == 'create' else 'Revisado'} |"
+    replaced = False
+    for index, line in enumerate(lines):
+        if line.startswith(entry_prefix):
+            cells = [cell.strip() for cell in line.strip("|").split("|")]
+            created = cells[1] if len(cells) > 1 else today
+            replacement = f"| {key} | {created} | {today} | {title} | {slides} | Revisado |"
+            lines[index] = replacement
+            replaced = True
+            break
+    if not replaced:
+        lines.append(replacement)
+    history.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Compose theme-led carousel PNG assets.")
     parser.add_argument("--parsed-json", type=Path, required=True)
@@ -132,25 +177,38 @@ def main() -> int:
     parser.add_argument("--visual-plan", type=Path, required=True)
     parser.add_argument("--image-dir", type=Path)
     parser.add_argument("--carousel", type=int)
+    parser.add_argument("--mode", choices=("create", "revise"), default="create")
     parser.add_argument("--format", required=True, choices=format_choices())
     parser.add_argument("--output-json", type=Path)
     args = parser.parse_args()
     parsed = json.loads(args.parsed_json.read_text(encoding="utf-8"))
     plan = json.loads(args.visual_plan.read_text(encoding="utf-8"))
     canvas = get_format(args.format)
+    if args.mode == "revise" and args.carousel is None:
+        parser.error("--mode revise requires --carousel so an existing carousel is updated in place")
     report: dict[str, Any] = {"output_root": str(args.output_root), "format": canvas.key, "dimensions": [canvas.width, canvas.height], "generated": []}
     for carousel in parsed.get("carousels", []):
         if args.carousel is not None and carousel["number"] != args.carousel:
             continue
         carousel_dir = args.output_root / f"Carousel {carousel['number']}"
+        if args.mode == "create" and carousel_dir.exists():
+            raise FileExistsError(f"{carousel_dir} already exists. Use --mode revise --carousel {carousel['number']} to update it in place.")
+        if args.mode == "revise" and not carousel_dir.exists():
+            raise FileNotFoundError(f"{carousel_dir} does not exist, so it cannot be revised.")
         description = carousel_dir / "Description.md"
-        if not description.exists():
-            carousel_dir.mkdir(parents=True, exist_ok=True)
-            description.write_text(description_markdown(carousel), encoding="utf-8")
+        carousel_dir.mkdir(parents=True, exist_ok=True)
+        description.write_text(description_markdown(carousel), encoding="utf-8")
+        slides_dir = carousel_dir / "slides"
+        expected = {f"slide-{slide['number']:02d}.png" for slide in carousel.get("slides", [])}
+        if args.mode == "revise" and slides_dir.exists():
+            for stale in slides_dir.glob("slide-*.png"):
+                if stale.name not in expected:
+                    stale.unlink()
         for slide in carousel.get("slides", []):
-            output = carousel_dir / "slides" / f"slide-{slide['number']:02d}.png"
+            output = slides_dir / f"slide-{slide['number']:02d}.png"
             source = compose_slide(carousel, slide, plan, args.image_dir, canvas, output)
-            report["generated"].append({"carousel": carousel["number"], "slide": slide["number"], "png": str(output), "source_image": source})
+            report["generated"].append({"carousel": carousel["number"], "slide": slide["number"], "png": str(output), "source_image": archive_source_image(source, carousel_dir)})
+        update_history(args.output_root, carousel, args.mode)
     if args.output_json:
         args.output_json.parent.mkdir(parents=True, exist_ok=True)
         args.output_json.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

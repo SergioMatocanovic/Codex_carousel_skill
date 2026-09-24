@@ -45,6 +45,14 @@ Use these inputs when available:
 * Brand profile: supplied or created during onboarding.
 * Output target: Instagram by default unless another channel is requested.
 
+## Output hierarchy and revisions
+
+Use one output root for the project. Its root contains `historico.md`; every carousel has its own `Carousel N` directory with `Description.md`, `slides/`, and `generated-images/`.
+
+`historico.md` must record the carousel number, creation date, last update, theme, slide count, and status. The compositor maintains this file when a carousel is created or revised.
+
+When the user asks to correct or alter a carousel, identify its existing number from `historico.md` or the project folders. Use `--mode revise --carousel N`. Update `Description.md`, final slides, generated source images, and the existing history entry inside that same `Carousel N` directory. Never create another carousel directory for a revision. If the specified carousel does not exist, stop and ask the user whether they want a new carousel.
+
 ## Select the canvas format
 
 Before generating visual assets, ask the user to choose one format. Do not assume a default.
@@ -68,9 +76,7 @@ Use `Carousel` and `Slide` headings:
 
 ```bash
 python scripts/parse_slides.py Slides.md \
-  --output-json parsed-slides.json \
-  --scaffold "Social Media/Instagram/Carousel Series" \
-  --create-descriptions
+  --output-json parsed-slides.json
 ```
 
 Stop and fix parser errors before generation. Review warnings before continuing.
@@ -98,6 +104,7 @@ python scripts/compose_theme_carousel.py \
   --visual-plan visual-plan.json \
   --image-dir generated-images \
   --output-root "Social Media/Instagram/Carousel Series" \
+  --mode create \
   --format vertical-principal \
   --output-json generation-report.json
 ```
@@ -105,6 +112,8 @@ python scripts/compose_theme_carousel.py \
 The compositor creates PNG slides and `Description.md`. It can also generate a clean typography-led fallback when no source image is present.
 
 Keep text within safe margins. Avoid tiny type, crowded blocks, clipped logos, and low contrast.
+
+For a correction, pass `--mode revise --carousel N`. This replaces only the contents of the existing `Carousel N` folder and updates its row in `historico.md`; it never creates a new carousel for a revision.
 
 ### 4. Create Markdown descriptions
 

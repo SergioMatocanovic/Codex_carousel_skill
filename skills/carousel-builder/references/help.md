@@ -26,6 +26,8 @@ Choose one canvas format before generation:
 
 The output includes sortable PNG slides and a `Description.md` caption file for each carousel. The workflow does not create Word documents.
 
+The project root also contains `historico.md`, which records each carousel's date, theme, slide count, and status. Corrections always update the existing carousel folder and its history entry.
+
 ## Example request
 
 ```text
